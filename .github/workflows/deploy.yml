@@ -21,8 +21,8 @@ jobs:
     - name: Install dependencies
       run: npm install -g yarn
 
-    - name: Build Strapi
-      run: yarn rebuild
+    # - name: Build Strapi
+    #   run: yarn rebuild
 
     - name: Start Strapi
       run: yarn develop
