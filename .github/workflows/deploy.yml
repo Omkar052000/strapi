@@ -1,0 +1,45 @@
+name: Deploy Strapi to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build Strapi
+      run: npm run build
+
+    - name: Deploy to EC2
+      env:
+        HOST: ${{ secrets.EC2_HOST }}
+        USER: ${{ secrets.EC2_USER }}
+        KEY: ${{ secrets.EC2_KEY }}
+      run: |
+        echo "${KEY}" > key.pem
+        chmod 400 key.pem
+
+        # SCP files to EC2
+        scp -i my_strapi_task-2_key.pem -r . $USER@$HOST:/home/ubuntu/strapi/my-project
+
+        # SSH into EC2 and run commands
+        ssh -i my_strapi_task-2_key.pem $USER@$HOST << 'EOF'
+          cd /home/ubuntu/strapi/my-project
+          npm install
+          npm run build
+          pm2 restart all || pm2 start npm --name "strapi" -- run develop
+        EOF
