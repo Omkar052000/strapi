@@ -22,7 +22,10 @@ jobs:
       run: npm install -g yarn
 
     - name: Build Strapi
-      run: npm run build
+      run: yarn rebuild
+
+    - name: Start Strapi
+      run: yarn develop
 
     - name: Deploy to EC2
       env:
