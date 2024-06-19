@@ -28,6 +28,11 @@ jobs:
       - name: Build Strapi project
         run: yarn build
 
+      - name: Add EC2 host key to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_HOST_KEY }}" >> ~/.ssh/known_hosts
+
       - name: Prepare SSH Key
         run: |
           echo "${KEY}" > key.pem
